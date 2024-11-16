@@ -34,9 +34,9 @@ defaults
 	errorfile 504 /etc/haproxy/errors/504.http
 
 frontend www
-	bind *:443
+	bind *:80
+	redirect scheme https code 301 if !{ ssl_fc }
 	default_backend webservers
-	http-request redirect scheme https
 
 backend webservers
 	balance roundrobin
