@@ -33,12 +33,17 @@ defaults
 	errorfile 503 /etc/haproxy/errors/503.http
 	errorfile 504 /etc/haproxy/errors/504.http
 
-frontend www
+frontend http_frontend
 	bind *:80
+	mode http
 	redirect scheme https code 301 if !{ ssl_fc }
-	default_backend webservers
 
-backend webservers
+frontend https-frontend
+	bind *:443 ssl crt /etc/letsencrypt/combined.pem
+	mode http
+	default_backend backend-server
+
+backend backend-server
 	balance roundrobin
-	server 6355-web-01 44.222.227.193:80 check
-	server 6355-web-02 34.228.16.92:80 check
+	server web-01 44.222.227.193:80 check
+	server web-02 34.228.16.92:80 check
