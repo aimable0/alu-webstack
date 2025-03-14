@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# This script retrieves some information about the domain name
+
+get_domain_info () {
+    awk '
+	$1 != ";;" {
+	    DOMAIN=$1
+	    sub (/\.[a-z]+\.[a-z]+\.$/, "", DOMAIN)
+   	    RECORD_TYPE=$4
+    	    DESTINATION=$NF
+    	    print "The subdomain", DOMAIN, "is a", RECORD_TYPE, "record and points to", DESTINATION;
+    }'
+}
+if [ $# -ge 2 ]; then
+	user_domain=$1;
+	user_subdomain=$2;
+	dig "${user_subdomain}.${user_domain}" | grep -A1 "ANSWER SECTION:" | get_domain_info;
+else
+	user_domain=$1;	
+	for subdomain in "www" "lb-01" "web-01" "web-02"; do
+		dig "${subdomain}.${user_domain}" | grep -A1 "ANSWER SECTION:" | get_domain_info;
+	done
+	
+fi
