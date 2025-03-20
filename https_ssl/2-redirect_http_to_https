@@ -35,12 +35,8 @@ defaults
 
 frontend http_frontend
 	bind *:80
-	mode http
-	redirect scheme https code 301 if !{ ssl_fc }
-
-frontend https-frontend
-	bind *:443 ssl crt /etc/letsencrypt/combined.pem
-	mode http
+	bind :443 ssl crt /etc/haproxy/lb.cert.pem
+	http-request redirect scheme https code 301 unless { ssl_fc }
 	default_backend backend-server
 
 backend backend-server
